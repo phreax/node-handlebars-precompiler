@@ -45,7 +45,7 @@ exports.do = function(opts) {
 
   var output = [];
   if (!opts.simple) {
-    output.push('(function() {\n  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};\n');
+    output.push('(function() {\n  var template = Handlebars.template, compiled, templates = Handlebars.templates = Handlebars.templates || {};\n');
   }
   function processTemplate(template, root) {
     var path = template,
@@ -82,7 +82,9 @@ exports.do = function(opts) {
       if (opts.simple) {
         output.push(handlebars.precompile(data, options) + '\n');
       } else {
-        output.push('templates[\'' + template + '\'] = template(' + handlebars.precompile(data, options) + ');\n');
+        output.push('compiled = template(' + handlebars.precompile(data, options) + ');\n');
+        output.push('if(Handlebars.set) {Handlebars.set(\''+ template + '\', compiled);}\n')
+        output.push('else {templates[\'' + template + '\'] = template(' + handlebars.precompile(data, options) + ');}\n');
       }
     }
   }
